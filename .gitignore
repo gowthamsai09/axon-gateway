@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+.wrangler/
+# Secrets and local config. NEVER commit these.
+.dev.vars
+.env
+.env.*
+*.pem
+*.key
+# CI checkout of the hub repo (schema checks)
+hub/

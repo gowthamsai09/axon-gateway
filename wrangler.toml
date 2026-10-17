@@ -1,0 +1,34 @@
+# Spec 7.2. PLACEHOLDERS must be filled in Phase 3. Nothing here is deployed in Phase 0.
+name = "axon-gateway"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"   # VERIFY against current Workers docs (Appendix B #3)
+
+[vars]
+FEED_BASE = "https://gowthamsai09.github.io/axon-feed/feed"   # Pages is enabled in Phase 1
+PUBLIC_URL = "https://axon-gateway.<account>.workers.dev"
+GITHUB_APP_ID = "<app id>"
+ALLOWED_PROVIDERS = "deepseek,huggingface"
+
+[[kv_namespaces]]
+binding = "TOKENS"
+id = "<kv id>"
+
+# Rate limiting bindings: syntax has changed over time, confirm in current Cloudflare docs
+# (Appendix B #4) before relying on this block.
+[[unsafe.bindings]]
+name = "RL_PUBLIC"
+type = "ratelimit"
+namespace_id = "1001"
+simple = { limit = 60, period = 60 }
+
+[[unsafe.bindings]]
+name = "RL_SUMMARY"
+type = "ratelimit"
+namespace_id = "1002"
+simple = { limit = 10, period = 60 }
+
+# Do not enable request/header logging for this Worker (Tier 2 headers contain caller keys).
+[observability]
+enabled = false
+
+# Secrets (never in this file): wrangler secret put GITHUB_APP_PRIVATE_KEY / GITHUB_WEBHOOK_SECRET

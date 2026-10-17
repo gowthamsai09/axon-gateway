@@ -1,0 +1,35 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@<pin-to-commit-sha>  # TODO: resolve per docs/pinning-actions.md in the hub repo
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@<pin-to-commit-sha>  # TODO: resolve per docs/pinning-actions.md in the hub repo
+        with:
+          repository: gowthamsai09/Axon
+          path: hub
+          persist-credentials: false
+      - uses: actions/setup-node@<pin-to-commit-sha>  # TODO: resolve per docs/pinning-actions.md in the hub repo
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run typecheck
+      - name: Tests (includes zod <-> hub JSON Schema contract test)
+        env:
+          HUB_SCHEMAS_DIR: ${{ github.workspace }}/hub/schemas
+          REQUIRE_HUB_SCHEMAS: "1"
+        run: npm test
