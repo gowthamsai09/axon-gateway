@@ -10,3 +10,5 @@ coverage/
 *.key
 # CI checkout of the hub repo (schema checks)
 hub/
+.mock-github.json
+*.dev.vars.example

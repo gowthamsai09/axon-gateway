@@ -1,34 +1,47 @@
-# Spec 7.2. PLACEHOLDERS must be filled in Phase 3. Nothing here is deployed in Phase 0.
+# Spec 7.2, updated in Phase 3 (Appendix C 45 to 56). Nothing here is deployed yet.
 name = "axon-gateway"
 main = "src/index.ts"
-compatibility_date = "2026-10-01"   # VERIFY against current Workers docs (Appendix B #3)
+compatibility_date = "2026-10-01"   # verified against the installed workerd (see STATE)
 
 [vars]
 FEED_BASE = "https://gowthamsai09.github.io/axon-feed/feed"   # Pages is enabled in Phase 1
-PUBLIC_URL = "https://axon-gateway.<account>.workers.dev"
-GITHUB_APP_ID = "<app id>"
+PUBLIC_URL = "https://axon-gateway.<account>.workers.dev"      # set after the first deploy; local: --var PUBLIC_URL:http://localhost:8787
 ALLOWED_PROVIDERS = "deepseek,huggingface"
+HF_DEFAULT_MODEL = "openai/gpt-oss-120b"
+# Tier 3 (Phase 4): the surface appears only when TOKENS, GITHUB_APP_ID and GITHUB_APP_PRIVATE_KEY all exist.
+# A placeholder id keeps Tier 3 off. Set the real values at the first push (docs/github-app-setup.md).
+GITHUB_APP_ID = "<app id>"
+# Never set ENVIRONMENT or the GITHUB_* override variables here: they exist only in .dev.vars for local mock runs.
 
 [[kv_namespaces]]
 binding = "TOKENS"
-id = "<kv id>"
+id = "<kv id>"   # wrangler kv namespace create TOKENS
 
-# Rate limiting bindings: syntax has changed over time, confirm in current Cloudflare docs
-# (Appendix B #4) before relying on this block.
-[[unsafe.bindings]]
+# Workers Rate Limiting binding, current syntax (Appendix B item 4, verified 2026-10-25).
+# `period` may only be 10 or 60. Counters are per Cloudflare location and approximate.
+[[ratelimits]]
 name = "RL_PUBLIC"
-type = "ratelimit"
 namespace_id = "1001"
-simple = { limit = 60, period = 60 }
+  [ratelimits.simple]
+  limit = 60
+  period = 60
 
-[[unsafe.bindings]]
+[[ratelimits]]
 name = "RL_SUMMARY"
-type = "ratelimit"
 namespace_id = "1002"
-simple = { limit = 10, period = 60 }
+  [ratelimits.simple]
+  limit = 10
+  period = 60
+
+[[ratelimits]]
+name = "RL_TIER3"
+namespace_id = "1003"
+  [ratelimits.simple]
+  limit = 30
+  period = 60
 
 # Do not enable request/header logging for this Worker (Tier 2 headers contain caller keys).
 [observability]
 enabled = false
 
-# Secrets (never in this file): wrangler secret put GITHUB_APP_PRIVATE_KEY / GITHUB_WEBHOOK_SECRET
+# Secret (never in this file): wrangler secret put GITHUB_APP_PRIVATE_KEY   (the .pem exactly as GitHub downloads it)

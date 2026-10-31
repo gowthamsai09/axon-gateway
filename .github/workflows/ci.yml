@@ -28,6 +28,8 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run lint
       - run: npm run typecheck
+      - name: Generated prompt module matches prompts/summarizer_system.txt
+        run: npm run prompt:check
       - name: Tests (includes zod <-> hub JSON Schema contract test)
         env:
           HUB_SCHEMAS_DIR: ${{ github.workspace }}/hub/schemas

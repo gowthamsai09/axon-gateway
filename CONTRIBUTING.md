@@ -14,6 +14,12 @@ npm run lint && npm run typecheck && npm test
 Schema contract tests read the hub's JSON Schemas from `../Axon/schemas` (override with
 `HUB_SCHEMAS_DIR`; set `REQUIRE_HUB_SCHEMAS=1` to fail instead of skip when missing).
 
+## Prompt sync
+
+`prompts/summarizer_system.txt` must stay byte-identical to the template's copy (spec 4.4). After editing it in
+the template, copy it here, run `npm run prompt:generate`, update the pinned id in `test/prompt.test.ts`, and check
+with `npm run prompt:compare -- <path to the template file>`.
+
 ## Rules
 
 - Keep files small and typed; add tests for every model or rule.
