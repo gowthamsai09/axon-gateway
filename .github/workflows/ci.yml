@@ -13,15 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@<pin-to-commit-sha>  # TODO: resolve per docs/pinning-actions.md in the hub repo
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
         with:
           persist-credentials: false
-      - uses: actions/checkout@<pin-to-commit-sha>  # TODO: resolve per docs/pinning-actions.md in the hub repo
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
         with:
           repository: gowthamsai09/Axon
           path: hub
           persist-credentials: false
-      - uses: actions/setup-node@<pin-to-commit-sha>  # TODO: resolve per docs/pinning-actions.md in the hub repo
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38  # v6.5.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -30,8 +30,18 @@ jobs:
       - run: npm run typecheck
       - name: Generated prompt module matches prompts/summarizer_system.txt
         run: npm run prompt:check
+      - name: Prompt equals the hub's canonical copy
+        run: npm run prompt:hub -- hub
       - name: Tests (includes zod <-> hub JSON Schema contract test)
         env:
           HUB_SCHEMAS_DIR: ${{ github.workspace }}/hub/schemas
           REQUIRE_HUB_SCHEMAS: "1"
+          HUB_CORPUS_DIR: ${{ github.workspace }}/hub/corpus/injection
+          REQUIRE_HUB_CORPUS: "1"
+          HUB_DIR: ${{ github.workspace }}/hub
+          REQUIRE_HUB_PROMPTS: "1"
         run: npm test
+      - name: The Worker bundles (no Cloudflare credentials, nothing is deployed)
+        env:
+          WRANGLER_SEND_METRICS: "false"
+        run: npx wrangler deploy --dry-run

@@ -48,8 +48,8 @@ export class FakeKv implements Kv {
   }
 }
 
-/** A matched PKCS#1 + PKCS#8 + public JWK triple of the same RSA key. */
-export async function appKeyBoth(): Promise<{ pkcs1: string; pkcs8: string; publicJwk: JWK }> {
+export type AppKeys = { pkcs1: string; pkcs8: string; publicJwk: JWK };
+async function generateAppKeys(): Promise<AppKeys> {
   const k = generateKeyPairSync("rsa", { modulusLength: 2048 });
   return {
     pkcs1: k.privateKey.export({ type: "pkcs1", format: "pem" }).toString(),
@@ -57,12 +57,30 @@ export async function appKeyBoth(): Promise<{ pkcs1: string; pkcs8: string; publ
     publicJwk: await exportJWK(k.publicKey),
   };
 }
+// RSA-2048 generation is the slowest part of a test kit (seconds on a loaded laptop). The key material
+// is immutable test data, so one matched triple is shared by every kit in this test file's worker.
+let appKeysOnce: Promise<AppKeys> | undefined;
+/** A matched PKCS#1 + PKCS#8 + public JWK triple of the same RSA key. */
+export function appKeyBoth(): Promise<AppKeys> {
+  return (appKeysOnce ??= generateAppKeys());
+}
 
 export type Oidc = { kid: string; privateKey: CryptoKey; jwks: { keys: JWK[] } };
-export async function oidcKit(kid = "kid-1", alg = "RS256", withAlg = true): Promise<Oidc> {
+const oidcKits = new Map<string, Promise<Oidc>>();
+async function generateOidcKit(kid: string, alg: string, withAlg: boolean): Promise<Oidc> {
   const { publicKey, privateKey } = await generateKeyPair(alg, { extractable: true });
   const jwk = { ...(await exportJWK(publicKey)), kid, ...(withAlg ? { alg, use: "sig" } : {}) };
   return { kid, privateKey, jwks: { keys: [jwk] } };
+}
+/** Shared per (kid, alg, withAlg): the same reasoning as appKeyBoth. Tests that need a DIFFERENT key use another kid. */
+export function oidcKit(kid = "kid-1", alg = "RS256", withAlg = true): Promise<Oidc> {
+  const id = `${kid}|${alg}|${String(withAlg)}`;
+  let kit = oidcKits.get(id);
+  if (kit === undefined) {
+    kit = generateOidcKit(kid, alg, withAlg);
+    oidcKits.set(id, kit);
+  }
+  return kit;
 }
 
 export type ClaimOver = Record<string, unknown>;

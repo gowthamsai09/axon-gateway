@@ -3,6 +3,12 @@
 Plane 3 of [Axon](https://github.com/gowthamsai09/Axon): a Cloudflare Worker (TypeScript, Hono) that serves
 **A2A** and **MCP** over one core. Spec: sections 4.3, 7, 8, 9. Local run: [docs/local-run.md](docs/local-run.md).
 
+**Phase 5 status (hardening, nothing deployed):** a `deploy.yml` workflow (after CI on `main`, environment `production` with
+a required reviewer, `scripts/check-deploy-config.js` refuses placeholder URLs, a bad KV id, override variables and enabled
+observability; Cloudflare secrets only in the deploy step), a `wrangler deploy --dry-run` step in CI, the shared injection
+corpus and SSRF cases from the hub, a byte check of the summarizer prompt against the hub (`npm run prompt:hub -- ..\Axon`),
+and `FEED_BASE` / `PUBLIC_URL` as IP literals refused. Procedures: `docs/npm-audit.md` and `docs/repo-hardening.md` in the hub.
+
 **Phase 4 status (Tier 3 done against mocks, nothing deployed):** `/register`, `/tokens`, `/tokens/:id` (GitHub OIDC), the
 `run_personal_digest` skill, real `tasks/get` and `tasks/cancel`, and the MCP tools `start_digest` and `get_digest_status` exist
 and appear **only when** `TOKENS`, `GITHUB_APP_ID` and `GITHUB_APP_PRIVATE_KEY` are configured. Otherwise the Phase 3 surface

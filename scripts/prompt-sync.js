@@ -47,7 +47,28 @@ if (command === "generate") {
     console.error(`DIFFERENT: gateway ${version(text)}, template ${version(theirs)}`);
     process.exit(1);
   }
+} else if (command === "hub" && other) {
+  // Compare with the hub's canonical copy and its id file (Appendix C 82). Exit 1 drift, 2 copy missing.
+  const prompts = resolve(other, "prompts");
+  let theirs;
+  let hubId;
+  try {
+    theirs = readFileSync(resolve(prompts, "summarizer_system.txt"), "utf8").replace(/\r\n/g, "\n");
+    hubId = readFileSync(resolve(prompts, "summarizer_system.version"), "utf8").trim();
+  } catch {
+    console.error("hub prompt copy missing (summarizer_system.txt or summarizer_system.version)");
+    process.exit(2);
+  }
+  if (theirs !== text) {
+    console.error(`DIFFERENT from the hub copy: gateway ${version(text)}, hub ${version(theirs)}`);
+    process.exit(1);
+  }
+  if (version(text) !== hubId) {
+    console.error(`prompt id ${version(text)} differs from the hub's ${hubId}`);
+    process.exit(1);
+  }
+  console.log(`matches the hub (${hubId})`);
 } else {
-  console.error("usage: node scripts/prompt-sync.js generate | check | compare <template summarizer_system.txt>");
+  console.error("usage: node scripts/prompt-sync.js generate | check | compare <template summarizer_system.txt> | hub <hub checkout>");
   process.exit(2);
 }

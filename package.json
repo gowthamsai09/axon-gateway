@@ -14,7 +14,8 @@
     "dev": "wrangler dev",
     "prompt:generate": "node scripts/prompt-sync.js generate",
     "prompt:check": "node scripts/prompt-sync.js check",
-    "prompt:compare": "node scripts/prompt-sync.js compare"
+    "prompt:compare": "node scripts/prompt-sync.js compare",
+    "prompt:hub": "node scripts/prompt-sync.js hub"
   },
   "dependencies": {
     "hono": "4.13.13",

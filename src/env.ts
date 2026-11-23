@@ -33,6 +33,10 @@ export const DEFAULT_DEEPSEEK_MODEL = "deepseek-v4-flash";
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
+const IPV4_LIKE = /^(?:0x[0-9a-f]+|\d+)(?:\.(?:0x[0-9a-f]+|\d+))*\.?$/i;
+/** An IP address written as a host. The URL parser already turns 2130706433 or 0x7f.1 into dotted form. */
+export const isIpLiteral = (host: string): boolean => host.startsWith("[") || IPV4_LIKE.test(host);
+
 /** https, or http only for loopback (local `wrangler dev` with a local feed server). */
 function baseUrl(value: string | undefined): string | null {
   if (!value) return null;
@@ -45,6 +49,8 @@ function baseUrl(value: string | undefined): string | null {
   if (url.username || url.password || url.search || url.hash) return null;
   if (url.protocol !== "https:" && !(url.protocol === "http:" && LOCAL_HOSTS.has(url.hostname))) return null;
   if (url.hostname.includes("<") || url.hostname.includes(">")) return null;
+  // An https base must be a DNS name: an IP literal (169.254.169.254, 10.0.0.1, [::1]) is never a feed host.
+  if (url.protocol === "https:" && isIpLiteral(url.hostname)) return null;
   return value.replace(/\/+$/, "");
 }
 
