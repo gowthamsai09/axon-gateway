@@ -152,6 +152,8 @@ describe("deprecation warning", () => {
   it.each(["deepseek-chat", "deepseek-reasoner"])("%s is flagged", (m) => expect(deprecationWarning("deepseek", m)).toContain("retired"));
   it("current ids and other providers are not", () => {
     expect(deprecationWarning("deepseek", "deepseek-v4-flash")).toBeNull();
+    expect(deprecationWarning("deepseek", "deepseek-flash")).toBeNull();
+    expect(deprecationWarning("deepseek", "deepseek-chat")).toContain("use deepseek-flash");
     expect(deprecationWarning("huggingface", "deepseek-chat")).toBeNull();
   });
 });

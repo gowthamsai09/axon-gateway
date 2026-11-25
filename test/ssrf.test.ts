@@ -96,7 +96,7 @@ describe("outbound hosts", () => {
     for (const host of hostsOf(fx.calls)) expect(ALLOWED.has(host), host).toBe(true);
   });
 
-  it.each(["https://evil.example", "deepseek.evil.example", "deepseek@evil.example", "huggingface/../x", "DEEPSEEK ", "http://api.deepseek.com"])(
+  it.each(["https://evil.example", "deepseek.evil.example", "deepseek@evil.example", "huggingface/../x", "DEEPSEEK\u00A0", "http://api.deepseek.com"])(
     "provider header %j cannot redirect the key anywhere and makes no outbound call",
     async (provider) => {
       const fx = makeFetch({ provider: answer });

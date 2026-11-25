@@ -16,7 +16,7 @@ const MAX_ATTEMPTS = 3;
 
 export function deprecationWarning(provider: ProviderName, model: string): string | null {
   return provider === "deepseek" && LEGACY_DEEPSEEK_MODELS.has(model)
-    ? `model ${model} was retired by DeepSeek on 2026-07-24; use deepseek-v4-flash`
+    ? `model ${model} was retired by DeepSeek on 2026-07-24; use deepseek-flash`
     : null;
 }
 

@@ -29,7 +29,7 @@ export type Env = {
 export const PROVIDER_NAMES = ["deepseek", "huggingface"] as const;
 export type ProviderName = (typeof PROVIDER_NAMES)[number];
 export const DEFAULT_HF_MODEL = "openai/gpt-oss-120b";
-export const DEFAULT_DEEPSEEK_MODEL = "deepseek-v4-flash";
+export const DEFAULT_DEEPSEEK_MODEL = "deepseek-flash";
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 

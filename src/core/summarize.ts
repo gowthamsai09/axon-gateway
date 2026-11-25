@@ -25,7 +25,9 @@ export function resolveCredentials(headers: Headers, env: Partial<Env>): Credent
   const providers = allowedProviders(env);
   const rawProvider = headers.get("x-llm-provider");
   if (rawProvider === null) throw new GatewayError("missing_parameter", "The X-LLM-Provider header is required.");
-  const provider = providers.find((p) => p === rawProvider.trim().toLowerCase());
+  const provider = rawProvider === rawProvider.trim()
+    ? providers.find((p) => p === rawProvider.toLowerCase())
+    : undefined;
   if (provider === undefined) {
     throw new GatewayError("invalid_params", `X-LLM-Provider must be one of: ${providers.join(", ") || "(none enabled)"}.`);
   }

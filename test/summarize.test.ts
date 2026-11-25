@@ -28,7 +28,7 @@ const filesFor = (...ids: string[]) => Object.fromEntries(ids.map((i) => [`items
 describe("resolveCredentials", () => {
   const h = (o: Record<string, string>) => new Headers(o);
   it("reads provider, key and default models", () => {
-    expect(resolveCredentials(h({ "x-llm-provider": "DeepSeek", "x-llm-key": KEY }), TEST_ENV)).toEqual({ provider: "deepseek", key: KEY, model: "deepseek-v4-flash" });
+    expect(resolveCredentials(h({ "x-llm-provider": "DeepSeek", "x-llm-key": KEY }), TEST_ENV)).toEqual({ provider: "deepseek", key: KEY, model: "deepseek-flash" });
     expect(resolveCredentials(h({ "x-llm-provider": "huggingface", "x-llm-key": KEY }), TEST_ENV).model).toBe("openai/gpt-oss-120b");
   });
   it("X-LLM-Model overrides the default", () => {
