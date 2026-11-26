@@ -49,3 +49,7 @@ pinned in `test/prompt.test.ts`. After any change in either repo, compare the tw
 ```powershell
 npm run prompt:compare -- ..\axon-template\digest\prompts\summarizer_system.txt
 ```
+
+## License
+
+Apache-2.0. See `LICENSE` and `NOTICE`.
