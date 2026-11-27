@@ -5,7 +5,7 @@ compatibility_date = "2026-10-01"   # verified against the installed workerd (se
 
 [vars]
 FEED_BASE = "https://gowthamsai09.github.io/axon-feed/feed"   # Pages is enabled in Phase 1
-PUBLIC_URL = "https://axon-gateway.<account>.workers.dev"      # set after the first deploy; local: --var PUBLIC_URL:http://localhost:8787
+PUBLIC_URL = "https://axon-gateway.gowthamsaiyadlapalli1234.workers.dev"      # set after the first deploy; local: --var PUBLIC_URL:http://localhost:8787
 ALLOWED_PROVIDERS = "deepseek,huggingface"
 HF_DEFAULT_MODEL = "openai/gpt-oss-120b"
 # Tier 3 (Phase 4): the surface appears only when TOKENS, GITHUB_APP_ID and GITHUB_APP_PRIVATE_KEY all exist.
@@ -15,7 +15,7 @@ GITHUB_APP_ID = "<app id>"
 
 [[kv_namespaces]]
 binding = "TOKENS"
-id = "<kv id>"   # wrangler kv namespace create TOKENS
+id = "5136d3ed7d074e1c81e670f4cedfbfe7"   # wrangler kv namespace create TOKENS
 
 # Workers Rate Limiting binding, current syntax (Appendix B item 4, verified 2026-10-25).
 # `period` may only be 10 or 60. Counters are per Cloudflare location and approximate.
