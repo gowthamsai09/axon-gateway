@@ -10,7 +10,7 @@ ALLOWED_PROVIDERS = "deepseek,huggingface"
 HF_DEFAULT_MODEL = "openai/gpt-oss-120b"
 # Tier 3 (Phase 4): the surface appears only when TOKENS, GITHUB_APP_ID and GITHUB_APP_PRIVATE_KEY all exist.
 # A placeholder id keeps Tier 3 off. Set the real values at the first push (docs/github-app-setup.md).
-GITHUB_APP_ID = "<app id>"
+GITHUB_APP_ID = "5953758"
 # Never set ENVIRONMENT or the GITHUB_* override variables here: they exist only in .dev.vars for local mock runs.
 
 [[kv_namespaces]]
