@@ -56,6 +56,24 @@ describe("TaskResult (zod)", () => {
     delete (neither.items[0] as Record<string, unknown>).summary;
     expect(TaskResult.safeParse(neither).success).toBe(false);
   });
+  it("accepts the file exactly as the template writes it: JSON null for the unused field", () => {
+    const withNulls = clone(valid());
+    (withNulls.items[0] as Record<string, unknown>).fallback_snippet = null;
+    const parsed = TaskResult.safeParse(withNulls);
+    expect(parsed.success).toBe(true);
+    expect(parsed.success && "fallback_snippet" in (parsed.data.items[0] ?? {})).toBe(false);
+    const snippet = clone(valid());
+    snippet.items = [{ id: "9c1e4a7b2d3f5a60", title: "t", url: "https://example.com/p", summary: null, fallback_snippet: "s" } as never];
+    expect(TaskResult.safeParse(snippet).success).toBe(true);
+  });
+  it("still needs exactly one: both null, and a null in any other field, are refused", () => {
+    const neither = clone(valid());
+    Object.assign(neither.items[0] as object, { summary: null, fallback_snippet: null });
+    expect(TaskResult.safeParse(neither).success).toBe(false);
+    const nullTitle = clone(valid());
+    Object.assign(nullTitle.items[0] as object, { title: null, fallback_snippet: null });
+    expect(TaskResult.safeParse(nullTitle).success).toBe(false);
+  });
   it.each(Object.keys(mutations))("rejects %s", (name) => {
     expect(TaskResult.safeParse(mutations[name]!(clone(valid()))).success).toBe(false);
   });
@@ -78,6 +96,12 @@ describe("TaskResult zod <-> hub JSON Schema", () => {
     const validate = ajv.compile(JSON.parse(readFileSync(schemaPath, "utf8")));
     it("agrees on the valid example", () => {
       expect(validate(valid())).toBe(true);
+    });
+    it("agrees on the file as the template writes it (null for the unused field)", () => {
+      const doc = clone(valid());
+      (doc.items[0] as Record<string, unknown>).fallback_snippet = null;
+      expect(validate(doc)).toBe(true);
+      expect(TaskResult.safeParse(doc).success).toBe(true);
     });
     it.each(Object.keys(mutations))("agrees on invalid case %s", (name) => {
       const bad = mutations[name]!(clone(valid()));

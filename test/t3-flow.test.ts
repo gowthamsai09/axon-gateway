@@ -235,6 +235,17 @@ describe("status, result and cancel", () => {
     expect(at(body, "result.artifacts.0.parts.0.data.untrusted")).toBe(true);
   });
 
+  it("a result file as the template really writes it (null for the unused field) completes", async () => {
+    const { k, token, id } = await started();
+    Object.assign(k.gh.state.runs[0] as object, { status: "completed", conclusion: "success" });
+    const real = resultFor(id);
+    real.items[0] = { ...(real.items[0] as object), fallback_snippet: null } as never;
+    k.gh.state.files.set(`state:tasks/${id}.json`, JSON.stringify(real));
+    const body = await bodyOf(await get(k, id, token));
+    expect(at(body, "result.status.state")).toBe("completed");
+    expect(JSON.stringify(at(body, "result.artifacts.0.parts.0.data.result.items"))).not.toContain("null");
+  });
+
   it.each([
     ["extra keys", (id: string) => ({ ...resultFor(id), extra: 1 })],
     ["both summary and snippet", (id: string) => ({ ...resultFor(id), items: [{ id: "0123456789abcdef", title: "t", url: "https://example.com/a", summary: { one_line: "x", key_points: [], why_it_matters: "", tags: [] }, fallback_snippet: "y" }] })],

@@ -66,17 +66,29 @@ const TaskItemSummary = z.strictObject({
   tags: z.array(TopicSlug).max(4),
 });
 
-const TaskItem = z
-  .strictObject({
-    id: z.string().regex(ITEM_ID),
-    title: z.string().min(1).max(500),
-    url: z.string().min(8).max(2048),
-    summary: TaskItemSummary.optional(),
-    fallback_snippet: z.string().max(300).optional(),
-  })
-  .refine((i) => (i.summary === undefined) !== (i.fallback_snippet === undefined), {
-    message: "provide exactly one of summary or fallback_snippet",
-  });
+// The template writes the unused one of the two fields as JSON null (pydantic default), and the hub JSON
+// Schema allows null for both. Drop those two nulls before validating so the result still means "exactly one".
+const dropNullChoices = (value: unknown): unknown => {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return value;
+  const item: Record<string, unknown> = { ...(value as Record<string, unknown>) };
+  for (const key of ["summary", "fallback_snippet"]) if (item[key] === null) delete item[key];
+  return item;
+};
+
+const TaskItem = z.preprocess(
+  dropNullChoices,
+  z
+    .strictObject({
+      id: z.string().regex(ITEM_ID),
+      title: z.string().min(1).max(500),
+      url: z.string().min(8).max(2048),
+      summary: TaskItemSummary.optional(),
+      fallback_snippet: z.string().max(300).optional(),
+    })
+    .refine((i) => (i.summary === undefined) !== (i.fallback_snippet === undefined), {
+      message: "provide exactly one of summary or fallback_snippet",
+    }),
+);
 
 export const TaskResult = z.strictObject({
   task_id: z.string().regex(UUID),
