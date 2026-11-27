@@ -33,11 +33,8 @@ describe("check-deploy-config", () => {
   it("accepts a real configuration (Tier 3 may stay off)", () => {
     expect(run(GOOD)).toEqual({ code: 0, err: "" });
   });
-  it("blocks the repository's own wrangler.toml until the placeholders are replaced (first push)", () => {
-    const r = run(readFileSync("wrangler.toml", "utf8"));
-    expect(r.code).toBe(1);
-    expect(r.err).toContain("PUBLIC_URL is still a placeholder");
-    expect(r.err).toContain("KV namespace id");
+  it("accepts the repository's own wrangler.toml (the placeholders were replaced at the first deploy)", () => {
+    expect(run(readFileSync("wrangler.toml", "utf8"))).toEqual({ code: 0, err: "" });
   });
   const bad: [string, (t: string) => string, string][] = [
     ["PUBLIC_URL placeholder", (t) => t.replace("axon-gateway.example.workers.dev", "axon-gateway.<account>.workers.dev"), "PUBLIC_URL is still a placeholder"],
