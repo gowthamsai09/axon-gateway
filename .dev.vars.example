@@ -1,0 +1,4 @@
+# Local overrides for `wrangler dev` (copy to .dev.vars, which is git-ignored). Never put LLM keys here.
+# For the Tier 3 mock flow run `node scripts/dev-setup.js` instead: it writes a complete .dev.vars.
+FEED_BASE=http://localhost:8788
+PUBLIC_URL=http://localhost:8787
