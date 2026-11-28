@@ -1,4 +1,4 @@
-node_modules/
+﻿node_modules/
 dist/
 coverage/
 .wrangler/
@@ -11,4 +11,3 @@ coverage/
 # CI checkout of the hub repo (schema checks)
 hub/
 .mock-github.json
-*.dev.vars.example
